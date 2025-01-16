@@ -35,6 +35,15 @@ func New() Service {
 	}
 }
 
+func NewDB() *mongo.Client {
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI(mongoURI))
+	if err != nil {
+		log.Fatal(err)
+
+	}
+	return client
+}
+
 func (s *service) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()

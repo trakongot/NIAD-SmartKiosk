@@ -1,6 +1,7 @@
 package server
 
 import (
+	"NIAD_SmartKiosk/internal/controller"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -17,6 +18,11 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true, // Enable cookies/auth
 	}))
 
+	PatientIdentityRouter := r.Group("/api")
+	{
+		PatientIdentityRouter.POST("/add", controller.NewPatientIdentityController().AddPatient)
+	}
+
 	r.GET("/", s.HelloWorldHandler)
 
 	r.GET("/health", s.healthHandler)
@@ -24,6 +30,7 @@ func (s *Server) RegisterRoutes() http.Handler {
 	return r
 }
 
+// test server
 func (s *Server) HelloWorldHandler(c *gin.Context) {
 	resp := make(map[string]string)
 	resp["message"] = "Hello World"
