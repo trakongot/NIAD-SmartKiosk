@@ -20,7 +20,8 @@ type service struct {
 }
 
 var (
-	mongoURI = os.Getenv("MONGO_URI")
+	mongoURI     = os.Getenv("MONGO_URI")
+	databaseName = os.Getenv(("DB_NAME"))
 )
 
 func New() Service {
@@ -44,6 +45,11 @@ func NewDB() *mongo.Client {
 	return client
 }
 
+func GetCollection(collection string) *mongo.Collection {
+	return NewDB().Database(databaseName).Collection(collection)
+}
+
+// check init database
 func (s *service) Health() map[string]string {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()

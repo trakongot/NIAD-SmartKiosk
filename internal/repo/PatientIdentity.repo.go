@@ -5,24 +5,39 @@ import (
 	"NIAD_SmartKiosk/internal/models"
 	"context"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type PatientIdentityRepo struct {
-	db *mongo.Client
+type PatientRepo struct {
+	Patient *mongo.Collection
 }
 
-func NewPatientIdentityRepo() *PatientIdentityRepo {
-	return &PatientIdentityRepo{
-		db: database.NewDB(),
+func NewPatientRepo() *PatientRepo {
+	return &PatientRepo{
+		Patient: database.GetCollection("Patient"),
 	}
 }
 
-func (pr *PatientIdentityRepo) Save(ctx context.Context, patientIdentity *models.PatientIdentity) error {
-	collection := pr.db.Database("NIAD").Collection("PatientIdentity")
+func (pr *PatientRepo) FindOne(ctx context.Context, filter interface{}) (*models.Patient, error) {
+	var patient models.Patient
 
-	_, err := collection.InsertOne(ctx, patientIdentity)
+	err := pr.Patient.FindOne(ctx, filter).Decode(&patient)
+
+	if err != nil {
+
+		return nil, err
+	}
+
+	return &patient, nil
+}
+
+func (pr *PatientRepo) Save(ctx context.Context, patient *models.Patient) error {
+	patient.CreatedAt = time.Now()
+	patient.UpdatedAt = time.Now()
+
+	_, err := pr.Patient.InsertOne(ctx, patient)
 	if err != nil {
 		log.Println("Error inserting document:", err)
 		return err

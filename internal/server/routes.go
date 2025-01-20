@@ -18,9 +18,10 @@ func (s *Server) RegisterRoutes() http.Handler {
 		AllowCredentials: true, // Enable cookies/auth
 	}))
 
-	PatientIdentityRouter := r.Group("/api")
+	PatientIdentityRouter := r.Group("/api/patient")
 	{
-		PatientIdentityRouter.POST("/add", controller.NewPatientIdentityController().AddPatient)
+		PatientIdentityRouter.POST("/add", controller.NewPatientController().AddPatient)
+		PatientIdentityRouter.GET("/", controller.NewPatientController().GetOneUser)
 	}
 
 	r.GET("/", s.HelloWorldHandler)

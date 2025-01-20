@@ -4,19 +4,37 @@ import (
 	"NIAD_SmartKiosk/internal/models"
 	"NIAD_SmartKiosk/internal/repo"
 	"context"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type PatientIdentityService struct {
-	patientRepo *repo.PatientIdentityRepo
+type PatientService struct {
+	patientRepo *repo.PatientRepo
 }
 
-func NewPatientIdentityService() *PatientIdentityService {
-	return &PatientIdentityService{
-		patientRepo: repo.NewPatientIdentityRepo(),
+func NewPatientService() *PatientService {
+	return &PatientService{
+		patientRepo: repo.NewPatientRepo(),
 	}
 }
 
-func (ps *PatientIdentityService) Save(ctx context.Context, patientIdentity *models.PatientIdentity) error {
+func (ps *PatientService) Save(ctx context.Context, patient *models.Patient) error {
 
-	return ps.patientRepo.Save(ctx, patientIdentity)
+	return ps.patientRepo.Save(ctx, patient)
+}
+
+func (ps *PatientService) FindOneByID(ctx context.Context, id string) (*models.Patient, error) {
+	// Chuyển ID từ string sang ObjectID
+	objectID, _ := primitive.ObjectIDFromHex(id)
+
+	filter := bson.M{"_id": objectID}
+
+	patient, err := ps.patientRepo.FindOne(ctx, filter)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return patient, nil
 }
